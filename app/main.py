@@ -1,23 +1,23 @@
 import configparser
 from fastapi import FastAPI
 from pymongo import MongoClient
+from config import settings
 
 from routes import router
 
-config = configparser.ConfigParser()
-config.read('../config.ini')
 
-database_url = config['DEFAULT']['DB_URL']
-database_name = config['DEFAULT']['DB_NAME']
-# secret_key = config['DEFAULT']['SECRET_KEY']
+app = FastAPI()
 
-app = FastAPI(debug=True)
+
+@app.get("/test")
+def root():
+    return {"message": "FastAPI is running."}
 
 
 @app.on_event("startup")
 def startup_db_client():
-    app.mongodb_client = MongoClient(database_url)
-    app.database = app.mongodb_client[database_name]
+    app.mongodb_client = MongoClient(settings.DB_URL)
+    app.database = app.mongodb_client[settings.DB_NAME]
     print("Connected to DB!")
 
 
@@ -28,4 +28,3 @@ def shutdown_db_client():
 
 
 app.include_router(router, tags=["tasks"], prefix="/task")
-

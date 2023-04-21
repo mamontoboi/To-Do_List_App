@@ -6,9 +6,10 @@ from bson import ObjectId
 
 class Task(BaseModel):
     # id: ObjectId = Field(default_factory=lambda: str(ObjectId()), alias="_id")
+    # id: str | None = None
     title: str = Field(...)
     description: Optional[str] = Field(max_length=500)
-    status: bool = Field(default=False, alias="completed")
+    status: bool = Field(default=False)
 
     @pydantic.validator('status')
     @classmethod
@@ -18,18 +19,17 @@ class Task(BaseModel):
             raise ValueError("Invalid status value. Write 'yes' or 'no', please.")
         return value
 
-    # @pydantic.root_validator(pre=True)
-    # @classmethod
-    # def check_the_task(cls, values):
-    #     try:
-    #         Task(title=values['title'], status=values['status'])
-    #     except ValidationError as e:
-    #         raise ValueError(str(e))
-    #     return values
+    @pydantic.root_validator(pre=True)
+    @classmethod
+    def check_the_task(cls, values):
+        if not values["title"]:
+            raise ValueError("The title is required")
+        return values
 
     class Config:
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
 
 
 class TaskUpdate(BaseModel):
@@ -48,6 +48,14 @@ class TaskUpdate(BaseModel):
     class Config:
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
+
+
+class TaskDetails(BaseModel):
+    id: str
+    title: str
+    description: Optional[str]
+    status: bool
+
 
 
 
