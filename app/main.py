@@ -1,10 +1,7 @@
-import configparser
 from fastapi import FastAPI
 from pymongo import MongoClient
-from config import settings
-
-from routes import router
-
+from .config import settings
+from .routes import router
 
 app = FastAPI()
 
