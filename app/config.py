@@ -6,7 +6,8 @@ class Settings(BaseSettings):
     DB_NAME: str
 
     class Config:
-        env_file = '../.env'
+        # env_file = '../.env'
+        env_file = '.env'
 
 
 settings = Settings()

@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from pymongo import MongoClient
+# from . import config
 from .config import settings
+# from . import routes
 from .routes import router
 
 app = FastAPI()
