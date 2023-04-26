@@ -1,23 +1,36 @@
 from typing import Optional
 import pydantic
-from pydantic import BaseModel, Field, ValidationError
+from pydantic import BaseModel, Field
 from bson import ObjectId
 
 
-class Task(BaseModel):
-    # id: ObjectId = Field(default_factory=lambda: str(ObjectId()), alias="_id")
-    # id: str | None = None
+class AbstractTask(BaseModel):
+    title: None
+    description: None
+    status: None
+
+    @pydantic.validator('status', pre=True)
+    @classmethod
+    def str_to_bool(cls, value):
+        if value.lower() in ['0', 'off', 'f', 'false', 'n', 'no', 'False', 'not completed']:
+            value = False
+            return value
+        elif value.lower() in ['1', 'on', 't', 'true', 'y', 'yes', 'True', 'completed']:
+            value = True
+            return value
+        else:
+            raise ValueError("Invalid status value. Write 'yes' or 'no', please.")
+
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+
+
+class Task(AbstractTask):
     title: str = Field(...)
     description: Optional[str] = Field(max_length=500)
     status: bool = Field(default=False)
-
-    @pydantic.validator('status')
-    @classmethod
-    def valid_status(cls, value):
-        allowed = ['0', 'off', 'f', 'false', 'n', 'no', '1', 'on', 't', 'true', 'y', 'yes', False, True]
-        if value is not None and value not in allowed:
-            raise ValueError("Invalid status value. Write 'yes' or 'no', please.")
-        return value
 
     @pydantic.root_validator(pre=True)
     @classmethod
@@ -26,37 +39,22 @@ class Task(BaseModel):
             raise ValueError("The title is required")
         return values
 
-    class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
 
-
-class TaskUpdate(BaseModel):
+class TaskUpdate(AbstractTask):
     title: Optional[str]
     description: Optional[str]
     status: Optional[bool]
-
-    @pydantic.validator('status')
-    @classmethod
-    def valid_status(cls, value):
-        allowed = ['0', 'off', 'f', 'false', 'n', 'no', '1', 'on', 't', 'true', 'y', 'yes']
-        if value is not None and value not in allowed:
-            raise ValueError("Invalid status value. Write 'yes' or 'no', please.")
-        return value
-
-    class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
 
 
 class TaskDetails(BaseModel):
     id: str
     title: str
-    description: Optional[str]
-    status: bool
+    description: str
+    status: str
 
-
-
-
-
+    @pydantic.validator('status', pre=True)
+    @classmethod
+    def bool_to_str(cls, value):
+        if isinstance(value, bool):
+            return "completed" if value else "not completed"
+        return value

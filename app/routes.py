@@ -22,7 +22,7 @@ def create_task(request: Request, task: Task):
     )
 
     created_task["id"] = str(created_task["_id"])
-
+    print(created_task)
     return TaskDetails(**created_task)
 
 
