@@ -6,7 +6,7 @@ from .routes import router
 app = FastAPI()
 
 
-@app.get("/test")
+@app.get("/api/test")
 def root():
     return {"message": "FastAPI is running."}
 
@@ -24,4 +24,4 @@ def shutdown_db_client():
     app.mongodb_client.close()
 
 
-app.include_router(router, tags=["tasks"], prefix="/task")
+app.include_router(router, tags=["tasks"], prefix="/api/tasks")

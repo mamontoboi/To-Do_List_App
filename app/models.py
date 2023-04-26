@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 from bson import ObjectId
 
 
-class AbstractTask(BaseModel):
+class BaseTask(BaseModel):
     title: None
     description: None
     status: None
@@ -27,7 +27,7 @@ class AbstractTask(BaseModel):
         json_encoders = {ObjectId: str}
 
 
-class Task(AbstractTask):
+class Task(BaseTask):
     title: str = Field(...)
     description: Optional[str] = Field(max_length=500)
     status: bool = Field(default=False)
@@ -40,7 +40,7 @@ class Task(AbstractTask):
         return values
 
 
-class TaskUpdate(AbstractTask):
+class TaskUpdate(BaseTask):
     title: Optional[str]
     description: Optional[str]
     status: Optional[bool]
