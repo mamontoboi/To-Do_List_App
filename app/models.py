@@ -12,10 +12,13 @@ class BaseTask(BaseModel):
     @pydantic.validator('status', pre=True)
     @classmethod
     def str_to_bool(cls, value):
-        if value.lower() in ['0', 'off', 'f', 'false', 'n', 'no', 'False', 'not completed']:
+        str_value = str(value).lower()
+        false_values = ['0', 'off', 'f', 'false', 'n', 'no', 'False', 'not completed']
+        true_values = ['1', 'on', 't', 'true', 'y', 'yes', 'True', 'completed']
+        if str_value in false_values:
             value = False
             return value
-        elif value.lower() in ['1', 'on', 't', 'true', 'y', 'yes', 'True', 'completed']:
+        elif str_value in true_values:
             value = True
             return value
         else:

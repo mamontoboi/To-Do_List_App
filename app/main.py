@@ -5,6 +5,7 @@ from .routes import router
 
 app = FastAPI()
 
+# http://127.0.0.1:8000/api/login
 
 @app.get("/api/test")
 def root():
