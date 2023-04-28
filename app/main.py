@@ -8,11 +8,6 @@ app = FastAPI()
 # http://127.0.0.1:8000/api/login
 
 
-@app.get("/favicon.ico")
-async def favicon():
-    return Response(content="", media_type="image/x-icon", status_code=204)
-
-
 @app.get("/api/test")
 def root():
     return {"message": "FastAPI is running."}
