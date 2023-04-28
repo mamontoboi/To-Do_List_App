@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from pymongo import MongoClient
 from .config import settings
 from .routes import router
@@ -10,7 +10,7 @@ app = FastAPI()
 
 @app.get("/favicon.ico")
 async def favicon():
-    return {"status": "ok"}
+    return Response(content="", media_type="image/x-icon", status_code=204)
 
 
 @app.get("/api/test")
