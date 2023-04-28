@@ -1,11 +1,8 @@
 from typing import List
-
 import bson
 from bson import ObjectId
-
 from fastapi import Request, Response, HTTPException, APIRouter, status
 from fastapi.encoders import jsonable_encoder
-
 from .serializers import task_serializer, list_of_tasks_serializer
 from .models import Task, TaskUpdate, TaskDetails
 
@@ -15,14 +12,18 @@ router = APIRouter()
 @router.post("/", response_model=TaskDetails, status_code=status.HTTP_201_CREATED,
              response_description="The new task was added!")
 def create_task(request: Request, task: Task):
-    task = jsonable_encoder(task)
-    new_task = request.app.database["tasks"].insert_one(task)
-    created_task = request.app.database["tasks"].find_one(
-        {"_id": new_task.inserted_id}
-    )
+    try:
+        task = jsonable_encoder(task)
+        new_task = request.app.database["tasks"].insert_one(task)
+        created_task = request.app.database["tasks"].find_one(
+            {"_id": new_task.inserted_id}
+        )
 
-    created_task["id"] = str(created_task["_id"])
-    return TaskDetails(**created_task)
+        created_task["id"] = str(created_task["_id"])
+        return TaskDetails(**created_task)
+    except ValueError as err:
+        print(err)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(err))
 
 
 @router.get("/", response_model=List[TaskDetails], status_code=status.HTTP_200_OK,
@@ -40,8 +41,7 @@ def find_task(request: Request, task_id: str):
     except bson.errors.InvalidId:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"The id {task_id} is not valid. Please provide a valid ObjectId string.")
-    else:
-        task = request.app.database["tasks"].find_one({"_id": task_object_id})
+    task = request.app.database["tasks"].find_one({"_id": task_object_id})
     if not task:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"The task with id {task_id} cannot be found!")
@@ -56,8 +56,7 @@ def update_task(task_id, request: Request, task: TaskUpdate):
     except bson.errors.InvalidId:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"The id {task_id} is not valid. Please provide a valid ObjectId string.")
-    else:
-        modified_task = request.app.database["tasks"].find_one({"_id": task_object_id})
+    modified_task = request.app.database["tasks"].find_one({"_id": task_object_id})
     if not modified_task:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"The task with id {task_id} cannot be found!")
@@ -77,12 +76,9 @@ def delete_task(task_id, request: Request, response: Response):
     except bson.errors.InvalidId:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"The id {task_id} is not valid. Please provide a valid ObjectId string.")
-    else:
-        deleted_task = request.app.database["tasks"].delete_one({"_id": task_object_id})
+    deleted_task = request.app.database["tasks"].delete_one({"_id": task_object_id})
     if deleted_task.deleted_count:
         response.status_code = status.HTTP_204_NO_CONTENT
         return response
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                         detail=f"The task with id {task_id} cannot be found!")
-
-

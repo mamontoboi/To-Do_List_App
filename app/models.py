@@ -18,11 +18,10 @@ class BaseTask(BaseModel):
         if str_value in false_values:
             value = False
             return value
-        elif str_value in true_values:
+        if str_value in true_values:
             value = True
             return value
-        else:
-            raise ValueError("Invalid status value. Write 'yes' or 'no', please.")
+        raise ValueError("Invalid status value. Write 'yes' or 'no', please.")
 
     class Config:
         allow_population_by_field_name = True
@@ -58,12 +57,10 @@ class TaskDetails(BaseModel):
     @pydantic.validator('status', pre=True)
     @classmethod
     def bool_to_str(cls, value):
-        # false_values = ['0', 'off', 'f', 'false', 'n', 'no', 'False', 'not completed']
         true_values = ['1', 'on', 't', 'true', 'y', 'yes', 'True', 'completed']
         if isinstance(value, bool):
             return "completed" if value else "not completed"
         if isinstance(value, str):
             return "completed" if value in true_values else "not completed"
         return value
-
 

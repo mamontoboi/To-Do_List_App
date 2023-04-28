@@ -1,11 +1,9 @@
-from fastapi import FastAPI, Response
+from fastapi import FastAPI
 from pymongo import MongoClient
 from .config import settings
 from .routes import router
 
 app = FastAPI()
-
-# http://127.0.0.1:8000/api/login
 
 
 @app.get("/api/test")
