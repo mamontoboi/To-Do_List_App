@@ -9,8 +9,13 @@ app = FastAPI()
 
 
 @app.get("/api/test")
+def test():
+    return {"message": "The app is running smoothly."}
+
+
+@app.get("/")
 def root():
-    return {"message": "FastAPI is running."}
+    return {"message": "Welcome to the app. Add '/docs' to your url to see the UI."}
 
 
 @app.on_event("startup")
