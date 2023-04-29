@@ -1,3 +1,5 @@
+"""This module creates a FastAPI instance and sets up routes for the application."""
+
 from fastapi import FastAPI
 from pymongo import MongoClient
 from .config import settings
@@ -6,14 +8,14 @@ from .routes import router
 app = FastAPI()
 
 
-@app.get("/api/test")
-def test():
-    return {"message": "The app is running smoothly."}
-
-
 @app.get("/")
 def root():
     return {"message": "Welcome to the app. Add '/docs' to your url to see the UI."}
+
+
+@app.get("/api/test")
+def test():
+    return {"message": "The app is running smoothly."}
 
 
 @app.on_event("startup")

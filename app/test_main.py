@@ -1,3 +1,5 @@
+"""The module contains unit tests for API endpoints with both positive and negative testing scenarios."""
+
 from bson import ObjectId
 from fastapi.testclient import TestClient
 from .main import app

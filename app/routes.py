@@ -1,3 +1,7 @@
+"""The module defines routes for application with endpoints for creating,
+reading, updating, and deleting tasks.
+"""
+
 from typing import List
 import bson
 from bson import ObjectId
@@ -9,6 +13,7 @@ from .models import Task, TaskUpdate, TaskDetails
 router = APIRouter()
 
 
+#  A POST endpoint that creates a new task in the database and returns the created task.
 @router.post("/", response_model=TaskDetails, status_code=status.HTTP_201_CREATED,
              response_description="The new task was added!")
 def create_task(request: Request, task: Task):
@@ -26,6 +31,7 @@ def create_task(request: Request, task: Task):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(err))
 
 
+# A GET endpoint that returns a list of all tasks in the database.
 @router.get("/", response_model=List[TaskDetails], status_code=status.HTTP_200_OK,
             response_description="The list of all tasks.")
 def list_tasks(request: Request):
@@ -33,6 +39,8 @@ def list_tasks(request: Request):
     return tasks
 
 
+# A GET endpoint that finds and returns a specific task by ID with HTTP status code 200,
+# or returns HTTP status code 404 if the task is not found.
 @router.get("/{task_id}", response_model=TaskDetails, status_code=status.HTTP_200_OK,
             response_description="Details of the specific task.")
 def find_task(request: Request, task_id: str):
@@ -48,6 +56,8 @@ def find_task(request: Request, task_id: str):
     return task_serializer(task)
 
 
+#  PATCH endpoint that updates a specific task by ID and returns the modified task with
+#  HTTP status code 200, or returns HTTP status code 404 if the task is not found.
 @router.patch("/{task_id}", response_model=TaskDetails, status_code=status.HTTP_200_OK,
               response_description="Details of the specific task.")
 def update_task(task_id, request: Request, task: TaskUpdate):
@@ -69,6 +79,8 @@ def update_task(task_id, request: Request, task: TaskUpdate):
     return {"id": str(modified_task["_id"]), **modified_task}
 
 
+# A DELETE endpoint that deletes a specific task by ID and returns HTTP status code 204
+# if the task is deleted, or returns HTTP status code 404 if the task is not found.
 @router.delete("/{task_id}", response_description="Delete specific task")
 def delete_task(task_id, request: Request, response: Response):
     try:

@@ -1,3 +1,6 @@
+"""The module for serializing tasks and lists of tasks."""
+
+
 def task_serializer(task):
     return {
         "id": str(task["_id"]),
